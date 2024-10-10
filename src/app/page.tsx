@@ -33,7 +33,11 @@ export default async function Home() {
           {posts ? (
             <form>
               <label>Please, choose your model</label>
-              <select name="model" onChange={handleChange}>
+              <select
+                name="model"
+                onChange={handleChange}
+                className="border-2 border-gray-950 rounded-lg ml-8"
+              >
                 <option value="" disabled></option>
                 {posts.Results.map((post: carModel) => (
                   <option key={post.MakeId} value={post.MakeName}>
