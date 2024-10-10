@@ -2,10 +2,20 @@
 "use client";
 
 export default async function Home() {
-  let data = await fetch(
-    "https://vpic.nhtsa.dot.gov/api/vehicles/GetMakesForVehicleType/car?format=json"
-  );
-  let posts = await data.json();
+  type carModel = {
+    MakeId: number;
+    MakeName: string;
+    VehicleTypeId: number;
+    VehicleTypeName: string;
+  };
+
+  const endpoint = process.env.NEXT_PUBLIC_MODEL_API;
+
+  let posts;
+  if (endpoint) {
+    let data = await fetch(endpoint);
+    posts = await data.json();
+  }
 
   const handleChange = (e: any) => {
     console.log(e);
@@ -20,17 +30,21 @@ export default async function Home() {
           year, and view the results on a separate page.
         </p>
         <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <form>
-            <label>Please, choose your model</label>
-            <select name="model" onChange={handleChange}>
-              <option value="" disabled></option>
-              {posts.Results.map((post: any) => (
-                <option key={post.MakeId} value={post.MakeName}>
-                  {post.MakeName}
-                </option>
-              ))}
-            </select>
-          </form>
+          {posts ? (
+            <form>
+              <label>Please, choose your model</label>
+              <select name="model" onChange={handleChange}>
+                <option value="" disabled></option>
+                {posts.Results.map((post: carModel) => (
+                  <option key={post.MakeId} value={post.MakeName}>
+                    {post.MakeName}
+                  </option>
+                ))}
+              </select>
+            </form>
+          ) : (
+            <p>Something went wrong</p>
+          )}
         </div>
       </main>
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
