@@ -16,7 +16,7 @@ export default function Home() {
   const [targetModel, setTargetModel] = useState();
   const [targetYear, setTargetYear] = useState();
 
-  const endpoint = process.env.NEXT_PUBLIC_BASE_URL;
+  // const endpoint = process.env.NEXT_PUBLIC_BASE_URL;
   const data = new Date();
   const yearArr = [];
   let newLink = `/result/undefined/undefined`;
@@ -30,7 +30,7 @@ export default function Home() {
   useEffect(() => {
     const data = async () => {
       try {
-        const fetchedModels = await getModel(endpoint);
+        const fetchedModels = await getModel();
         setModels(fetchedModels);
       } catch (error) {
         console.error("Error fetching products by ID:", error);
@@ -66,7 +66,7 @@ export default function Home() {
               >
                 <option value="" disabled></option>
                 {models.Results.map((model: carModel) => (
-                  <option key={model.MakeId} value={model.MakeName}>
+                  <option key={model.MakeId} value={model.MakeId}>
                     {model.MakeName}
                   </option>
                 ))}
