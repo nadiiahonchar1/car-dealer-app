@@ -1,7 +1,10 @@
-// import Image from "next/image";
 "use client";
+import { useEffect, useState } from "react";
+import { getModel } from "./api/fetch";
 
-export default async function Home() {
+import Link from "next/link";
+
+export default function Home() {
   type carModel = {
     MakeId: number;
     MakeName: string;
@@ -9,16 +12,39 @@ export default async function Home() {
     VehicleTypeName: string;
   };
 
-  const endpoint = process.env.NEXT_PUBLIC_MODEL_API;
+  const [models, setModels] = useState();
+  const [targetModel, setTargetModel] = useState();
+  const [targetYear, setTargetYear] = useState();
 
-  let posts;
-  if (endpoint) {
-    let data = await fetch(endpoint);
-    posts = await data.json();
+  const endpoint = process.env.NEXT_PUBLIC_BASE_URL;
+  const data = new Date();
+  const yearArr = [];
+  let newLink = `/result/undefined/undefined`;
+
+  for (let i = 2015; i <= data.getFullYear(); i++) {
+    yearArr.push(i);
   }
 
-  const handleChange = (e: any) => {
-    console.log(e);
+  let posts;
+
+  useEffect(() => {
+    const data = async () => {
+      try {
+        const fetchedModels = await getModel(endpoint);
+        setModels(fetchedModels);
+      } catch (error) {
+        console.error("Error fetching products by ID:", error);
+      }
+    };
+    data();
+  }, []);
+
+  const handleChangeModel = (e: any) => {
+    setTargetModel(e.target.value);
+  };
+
+  const handleChangeYear = (e: any) => {
+    setTargetYear(e.target.value);
   };
 
   return (
@@ -30,18 +56,31 @@ export default async function Home() {
           year, and view the results on a separate page.
         </p>
         <div className="flex gap-4 items-center flex-col sm:flex-row">
-          {posts ? (
+          {models ? (
             <form>
               <label>Please, choose your model</label>
               <select
                 name="model"
-                onChange={handleChange}
-                className="border-2 border-gray-950 rounded-lg ml-8"
+                onChange={handleChangeModel}
+                className="border-2 border-gray-950 rounded-lg block"
               >
                 <option value="" disabled></option>
-                {posts.Results.map((post: carModel) => (
-                  <option key={post.MakeId} value={post.MakeName}>
-                    {post.MakeName}
+                {models.Results.map((model: carModel) => (
+                  <option key={model.MakeId} value={model.MakeName}>
+                    {model.MakeName}
+                  </option>
+                ))}
+              </select>
+              <label>Please, choose year</label>
+              <select
+                name="year"
+                onChange={handleChangeYear}
+                className="border-2 border-gray-950 rounded-lg block"
+              >
+                <option value="" disabled></option>
+                {yearArr.map((i) => (
+                  <option key={i} value={i}>
+                    {i}
                   </option>
                 ))}
               </select>
@@ -49,6 +88,12 @@ export default async function Home() {
           ) : (
             <p>Something went wrong</p>
           )}
+          <Link
+            href={`/result/${targetModel}/${targetYear}`}
+            className="border-2 border-gray-950 rounded-lg block p-2"
+          >
+            Go to /result/{targetModel}/{targetYear}
+          </Link>
         </div>
       </main>
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
